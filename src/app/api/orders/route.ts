@@ -78,31 +78,24 @@ export async function POST(request: NextRequest) {
 
         orderItemsData.push({
           menuItemId: dbItem.id,
-          name: dbItem.name,
           quantity: cartItem.quantity,
-          priceAtTime: dbItem.price,
-          specialInstructions: cartItem.specialInstructions || null,
-          customizations: {
-            create: customizationData
-          }
+          specialInstructions: cartItem.specialInstructions || "",
+          selectedCustomizations: customizationData.length > 0 ? JSON.stringify(customizationData) : null,
+          itemTotal: lineTotal
         });
       }
 
-      const tax = parseFloat((subtotal * 0.08).toFixed(2));
-      const total = subtotal + tax + deliveryFee;
+      const total = subtotal + deliveryFee;
 
       // 3. Create the order
       const newOrder = await tx.order.create({
         data: {
           userId,
           status: 'PENDING',
-          paymentStatus: paymentMethod === 'CARD' ? 'PAID' : 'PENDING',
           subtotal,
-          tax,
           deliveryFee,
           total,
-          deliveryAddressId: savedAddress.id,
-          specialInstructions: specialInstructions || null,
+          addressId: savedAddress.id,
           items: {
             create: orderItemsData
           }

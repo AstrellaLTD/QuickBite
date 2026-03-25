@@ -9,7 +9,7 @@ function mapPrismaItems(prismaItems: any[]): MenuItem[] {
     name: item.name,
     description: item.description,
     price: item.price,
-    imageUrl: item.imageUrl,
+    image: item.imageUrl,
     categoryId: item.categoryId,
     isAvailable: item.isAvailable,
     customizations: item.customizations.map((c: any) => ({
@@ -52,7 +52,8 @@ export default async function MenuPage() {
     id: c.id,
     name: c.name,
     slug: c.slug,
-    imageUrl: c.imageUrl || undefined,
+    sortOrder: c.sortOrder,
+    isActive: c.isActive,
   }));
 
   const items = mapPrismaItems(dbItems);

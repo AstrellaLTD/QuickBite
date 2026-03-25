@@ -6,26 +6,26 @@ export default async function AdminOrdersPage() {
     orderBy: { createdAt: 'desc' },
     take: 50,
     include: {
-      user: {
+      customer: {
         select: {
           name: true,
           email: true
         }
       },
-      deliveryAddress: {
+      address: {
         select: {
           street: true
         }
       },
       items: {
-        select: {
-          id: true,
-          name: true,
-          quantity: true
+        include: {
+          menuItem: {
+            select: { name: true }
+          }
         }
       }
     }
   });
 
-  return <AdminOrdersClient orders={orders} />;
+  return <AdminOrdersClient orders={orders.map((o: any) => ({ ...o, user: o.customer })) as any} />;
 }

@@ -4,19 +4,17 @@ import { notFound, redirect } from 'next/navigation';
 import { formatPrice, formatDate } from '@/lib/utils';
 import Link from 'next/link';
 
-interface OrderPageProps {
-  params: { id: string };
-  searchParams: { success?: string };
-}
+export default async function OrderPage(props: any) {
+  const { id } = await (props.params as Promise<{ id: string }>);
+  const searchParams = await (props.searchParams as Promise<{ success?: string }>);
 
-export default async function OrderPage({ params, searchParams }: OrderPageProps) {
   const session = await auth();
   if (!session?.user) {
     redirect('/login');
   }
 
   const order = await prisma.order.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       address: true,
       items: {

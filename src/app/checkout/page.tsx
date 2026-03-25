@@ -113,11 +113,11 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-2" style={{ gap: 'var(--space-md)' }}>
               <div className="form-group">
                 <label className="form-label">Name</label>
-                <input type="text" className="form-input" value={session.user?.name || ''} disabled />
+                <input type="text" className="form-input" value={session?.user?.name || ''} disabled />
               </div>
               <div className="form-group">
                 <label className="form-label">Email</label>
-                <input type="email" className="form-input" value={session.user?.email || ''} disabled />
+                <input type="email" className="form-input" value={session?.user?.email || ''} disabled />
               </div>
             </div>
           </div>
