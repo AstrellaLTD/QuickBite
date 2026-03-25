@@ -17,6 +17,10 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
   title: {
     default: 'QuickBite – Fast Food Delivery',
     template: '%s | QuickBite',
