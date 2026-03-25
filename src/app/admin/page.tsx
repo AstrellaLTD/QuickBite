@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import prisma from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const session = await auth();

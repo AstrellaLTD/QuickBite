@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import AdminOrdersClient from './OrdersClient';
 
 export default async function AdminOrdersPage() {
