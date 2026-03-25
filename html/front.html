@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HibaFood — Livraison Express · Ferrières-en-Gâtinais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0c0a09;
+    --surface: rgba(255,255,255,0.055);
+    --surface-hover: rgba(255,255,255,0.09);
+    --border: rgba(255,255,255,0.10);
+    --border-glow: rgba(255,140,50,0.35);
+    --accent: #FF6B2B;
+    --accent-2: #FFB347;
+    --accent-glow: rgba(255,107,43,0.25);
+    --text: #f5f0eb;
+    --text-muted: rgba(245,240,235,0.5);
+    --text-dim: rgba(245,240,235,0.28);
+    --radius: 22px;
+    --radius-sm: 14px;
+    --section-gap: 36px;
+    --section-title-gap: 20px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── AMBIENT BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 10%, rgba(255,107,43,0.13) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 50% at 85% 20%, rgba(255,179,71,0.09) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 90%, rgba(255,80,20,0.08) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* subtle noise grain */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.45;
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; }
+
+  /* ── GLASS MIXIN ── */
+  .glass {
+    background: var(--surface);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: relative; z-index: 100;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0;
+    display: flex; align-items: center;
+    background: rgba(20, 16, 12, 0.88);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 100px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset;
+    overflow: hidden;
+  }
+
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem; font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    padding: 12px 20px 12px 24px;
+    flex-shrink: 0;
+  }
+
+  .nav-logo span { -webkit-text-fill-color: var(--accent); }
+
+  .nav-links {
+    display: flex; gap: 4px; list-style: none;
+    flex: 1; justify-content: center;
+    padding: 8px 12px;
+  }
+
+  .nav-links a {
+    color: var(--text-muted); text-decoration: none;
+    font-size: 0.87rem; font-weight: 400; letter-spacing: 0.02em;
+    padding: 8px 18px; border-radius: 100px;
+    transition: color 0.2s, background 0.2s;
+    display: block;
+  }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .nav-links a.active {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(255,107,43,0.4);
+  }
+
+  /* Orange icon section on the right */
+  .nav-icons {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 12px;
+    flex-shrink: 0;
+  }
+
+  .nav-icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .nav-icon-btn:hover {
+    background: rgba(255,255,255,0.13);
+    border-color: rgba(255,255,255,0.18);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  .nav-icon-btn .badge {
+    position: absolute; top: 2px; right: 2px;
+    min-width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.58rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(255,107,43,0.6);
+  }
+
+  /* ── MAIN GRID ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 24px 80px; display: flex; flex-direction: column; gap: var(--section-gap); }
+
+  /* ── BENTO GRID ── */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 80px;
+    gap: 14px;
+    overflow: visible;
+    padding-bottom: 4px;
+  }
+
+  /* ── HERO CARD ── */
+  .card-hero {
+    grid-column: span 12; grid-row: span 6;
+    position: relative; overflow: hidden;
+    border-radius: var(--radius);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 52px 56px;
+    min-height: 520px;
+    border: 1px solid var(--border);
+  }
+
+  .card-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg,
+      rgba(255,107,43,0.18) 0%,
+      rgba(12,10,9,0.0) 40%,
+      rgba(12,10,9,0.75) 100%);
+    z-index: 1;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 70% at 70% 30%, rgba(255,140,50,0.22) 0%, transparent 60%),
+      linear-gradient(135deg, #1a0f08 0%, #0c0a09 100%);
+    z-index: 0;
+  }
+
+  /* big decorative emoji burger */
+  .hero-emoji {
+    position: absolute; top: 50%; right: 8%;
+    transform: translateY(-50%);
+    font-size: 290px; line-height: 1;
+    filter: drop-shadow(0 40px 80px rgba(255,107,43,0.35));
+    z-index: 0; opacity: 0.95;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-14px) rotate(-4deg); }
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,107,43,0.18); border: 1px solid rgba(255,107,43,0.4);
+    border-radius: 100px; padding: 5px 14px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent-2);
+    margin-bottom: 16px;
+  }
+
+  .hero-tag::before { content: '●'; font-size: 0.5rem; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 5vw, 3.8rem);
+    font-weight: 700; line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+
+  .hero-title .highlight {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .hero-sub {
+    color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;
+    max-width: 380px; margin-bottom: 28px;
+  }
+
+  .hero-actions { display: flex; gap: 12px; align-items: center; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: #fff; border: none; padding: 14px 28px;
+    border-radius: 100px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.03em;
+    box-shadow: 0 8px 30px rgba(255,107,43,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,107,43,0.5); }
+
+  .btn-ghost {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); padding: 14px 24px;
+    border-radius: 100px; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; letter-spacing: 0.03em;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s, border-color 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.2); }
+
+  /* ── CARD: STATUS / OPEN ── */
+  .card-status {
+    grid-column: span 6; grid-row: span 2;
+    padding: 24px 28px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+
+  .status-indicator {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .status-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 10px rgba(74,222,128,0.7);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .status-label { font-size: 0.75rem; font-weight: 600; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .status-title { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+  .status-sub { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
+
+  .status-hours {
+    display: flex; gap: 14px; margin-top: 14px;
+  }
+  .hour-block {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 14px; text-align: center;
+  }
+  .hour-block .time { font-size: 0.88rem; font-weight: 600; color: var(--accent-2); }
+  .hour-block .label { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── CATEGORIES SECTION (Updated Glass Effect) ── */
+  .categories-section {
+    display: flex; flex-direction: column; gap: var(--section-title-gap);
+    overflow: hidden;
+    padding-bottom: 4px;
+  }
+
+  .card-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-dim);
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .card-label::before {
+    content: '';
+    display: inline-block;
+    width: 18px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    flex-shrink: 0;
+  }
+
+  .cat-grid {
+    display: flex; flex-direction: row; gap: 14px;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 8px 4px 12px; /* Space for hover effects */
+  }
+  .cat-grid::-webkit-scrollbar { display: none; }
+
+  .cat-item {
+    background: rgba(255, 255, 255, 0.03); 
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 0;
+    flex: 1; min-width: 120px; aspect-ratio: 1 / 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    cursor: pointer;
+    transition: transform 0.25s, background 0.25s, border-color 0.25s, box-shadow 0.25s;
+    text-decoration: none;
+    color: var(--text);
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  .cat-item:hover {
+    background: rgba(255, 107, 43, 0.1);
+    border-color: rgba(255, 107, 43, 0.4);
+    transform: translateY(-8px);
+    box-shadow: 
+      0 20px 40px -12px rgba(255, 107, 43, 0.25),
+      0 0 0 1px rgba(255, 107, 43, 0.2) inset;
+  }
+
+  .cat-emoji { font-size: 2.4rem; line-height: 1; }
+  .cat-info { text-align: center; }
+  .cat-info .cat-name { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .cat-info .cat-count { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── CARD: PROMO ── */
+  .card-promo {
+    grid-column: span 8; grid-row: span 3;
+    position: relative; overflow: hidden;
+    padding: 30px;
+    display: flex; align-items: center; gap: 24px;
+    background: linear-gradient(135deg, rgba(255,107,43,0.15) 0%, rgba(255,179,71,0.08) 100%);
+    border: 1px solid rgba(255,107,43,0.25);
+  }
+
+  .promo-badge {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: #fff; padding: 4px 12px; border-radius: 100px;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; display: inline-block; margin-bottom: 10px;
+  }
+
+  .promo-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .promo-sub { color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; }
+
+  .promo-emoji-wrap {
+    font-size: 90px; line-height: 1; flex-shrink: 0;
+    filter: drop-shadow(0 10px 30px rgba(255,107,43,0.35));
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .promo-arrow {
+    margin-top: 16px; display: inline-flex; align-items: center; gap: 6px;
+    color: var(--accent-2); font-size: 0.82rem; font-weight: 600;
+    text-decoration: none; letter-spacing: 0.03em;
+    transition: gap 0.2s;
+  }
+  .promo-arrow:hover { gap: 10px; }
+
+  /* ── BESTSELLERS ── */
+  .section-header {
+    grid-column: span 12;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 4px 4px;
+  }
+
+  .section-header-left { display: flex; flex-direction: column; gap: 5px; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.1rem; font-weight: 700; line-height: 1;
+  }
+
+  .section-title .title-highlight {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .section-title .title-emoji {
+    -webkit-text-fill-color: initial;
+  }
+
+  .section-link {
+    color: var(--accent); font-size: 0.82rem; font-weight: 500;
+    text-decoration: none; letter-spacing: 0.03em;
+    display: flex; align-items: center; gap: 4px;
+    transition: gap 0.2s;
+  }
+  .section-link:hover { gap: 8px; }
+
+  /* ── PRODUCT CARD ── */
+  .card-product {
+    grid-column: span 3; grid-row: span 4;
+    padding: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    cursor: pointer; transition: transform 0.25s, border-color 0.25s;
+    position: relative;
+  }
+
+  .card-product:hover { transform: translateY(-4px); border-color: rgba(255,107,43,0.4); }
+
+  .product-img {
+    width: 100%; aspect-ratio: 1/1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 72px; line-height: 1;
+    background: linear-gradient(135deg, rgba(255,107,43,0.08), rgba(255,179,71,0.05));
+    position: relative; overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .product-img .img-emoji {
+    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(255,107,43,0.3));
+  }
+
+  .product-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+  .product-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+  .product-desc { color: var(--text-muted); font-size: 0.72rem; line-height: 1.5; flex: 1; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+  .product-price { font-size: 1.1rem; font-weight: 700; color: var(--accent-2); }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    border: none; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 1.2rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(255,107,43,0.4);
+    transition: transform 0.2s;
+  }
+  .btn-add:hover { transform: scale(1.1) rotate(90deg); }
+
+  /* ── DELIVERY CARD ── */
+  .card-delivery {
+    grid-column: span 6; grid-row: span 4;
+    padding: 32px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,107,43,0.12) 0%, rgba(255,179,71,0.06) 100%);
+    border: 1px solid rgba(255,107,43,0.2);
+  }
+
+  .delivery-emoji {
+    font-size: 64px; margin-bottom: 20px;
+    animation: delivery-move 3s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  @keyframes delivery-move {
+    0%,100% { transform: translateX(0); }
+    50% { transform: translateX(12px); }
+  }
+
+  .delivery-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; font-weight: 700; line-height: 1.15; margin-bottom: 12px;
+  }
+
+  .delivery-sub { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; max-width: 340px; margin-bottom: 24px; }
+
+  .delivery-stats {
+    display: flex; gap: 24px;
+  }
+
+  .stat { }
+  .stat-val { font-size: 1.6rem; font-weight: 700; color: var(--accent-2); font-family: 'DM Serif Display', serif; }
+  .stat-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── FEATURES ── */
+  .card-feat {
+    grid-column: span 3; grid-row: span 2;
+    padding: 22px 24px;
+    display: flex; align-items: flex-start; gap: 14px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .card-feat:hover { background: var(--surface-hover); border-color: rgba(255,107,43,0.3); }
+
+  .feat-icon {
+    font-size: 1.6rem; flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(255,107,43,0.12); border: 1px solid rgba(255,107,43,0.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .feat-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+  .feat-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── CONTACT CARD ── */
+  .card-contact {
+    grid-column: span 6; grid-row: span 3;
+    padding: 30px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+
+  .contact-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+
+  .contact-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s;
+  }
+  .contact-row:hover { background: rgba(255,255,255,0.07); }
+
+  .contact-icon { font-size: 1.2rem; }
+  .contact-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .contact-val { font-size: 0.88rem; font-weight: 500; margin-top: 1px; }
+
+  /* ── SPECIAL OFFERS SECTION ── */
+  .offers-section {
+    display: flex; flex-direction: column; gap: var(--section-title-gap);
+  }
+
+  .offers-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+
+  .offers-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 14px;
+  }
+
+  /* Big hero offer card */
+  .offer-hero {
+    grid-column: 1; grid-row: 1 / span 2;
+    position: relative; overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,107,43,0.30);
+    background: linear-gradient(145deg, rgba(255,107,43,0.18) 0%, rgba(255,100,20,0.06) 60%, rgba(12,10,9,0.5) 100%);
+    padding: 36px 36px 32px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 320px;
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    transition: border-color 0.25s, transform 0.25s;
+    cursor: pointer;
+  }
+  .offer-hero:hover {
+    border-color: rgba(255,107,43,0.55);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 60px -12px rgba(255,107,43,0.3);
+  }
+
+  .offer-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 70% at 75% 30%, rgba(255,140,50,0.28) 0%, transparent 60%);
+  }
+
+  .offer-hero-emoji {
+    position: absolute; right: -10px; top: 50%; transform: translateY(-60%);
+    font-size: 150px; line-height: 1;
+    filter: drop-shadow(0 20px 50px rgba(255,107,43,0.4));
+    animation: float 5s ease-in-out infinite;
+    z-index: 1; opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .offer-hero-content { position: relative; z-index: 2; }
+
+  .offer-hero .offer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: #fff; padding: 5px 14px; border-radius: 100px;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(255,107,43,0.4);
+  }
+
+  .offer-hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 700; line-height: 1.1;
+    margin-bottom: 10px;
+    max-width: 280px;
+  }
+
+  .offer-hero-desc {
+    color: var(--text-muted); font-size: 0.82rem; line-height: 1.55;
+    max-width: 300px; margin-bottom: 22px;
+  }
+
+  .offer-price-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+  }
+  .offer-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; font-weight: 700; color: var(--accent-2);
+    line-height: 1;
+  }
+  .offer-price-old {
+    font-size: 1rem; color: var(--text-dim);
+    text-decoration: line-through;
+  }
+  .offer-saving {
+    background: rgba(74, 222, 128, 0.15); border: 1px solid rgba(74,222,128,0.3);
+    color: #4ade80; font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px;
+    letter-spacing: 0.06em;
+  }
+
+  .offer-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: #fff; border: none; padding: 12px 22px;
+    border-radius: 100px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.03em;
+    box-shadow: 0 6px 24px rgba(255,107,43,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+  }
+  .offer-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 34px rgba(255,107,43,0.5); }
+
+  /* Small offer cards (right column) */
+  .offer-small {
+    grid-column: 2;
+    position: relative; overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    padding: 24px 26px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 150px;
+    transition: border-color 0.25s, transform 0.25s, background 0.25s;
+    cursor: pointer;
+  }
+  .offer-small:hover {
+    transform: translateY(-3px);
+    background: var(--surface-hover);
+  }
+
+  .offer-small-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+
+  .offer-small-emoji {
+    font-size: 52px; line-height: 1;
+    filter: drop-shadow(0 6px 18px rgba(255,107,43,0.3));
+    animation: float 6s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .offer-small-badge {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px; border-radius: 100px;
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 8px;
+    align-self: flex-start;
+  }
+
+  .offer-small-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  .offer-small-desc {
+    color: var(--text-muted); font-size: 0.76rem; line-height: 1.45;
+  }
+
+  .offer-small-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 16px;
+  }
+
+  .offer-small-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem; font-weight: 700; color: var(--accent-2);
+  }
+
+  .offer-arrow {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.78rem; font-weight: 600;
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+  .offer-arrow:hover { gap: 9px; }
+
+  /* Double Kiff — golden tint */
+  .offer-small.kiff {
+    background: linear-gradient(135deg, rgba(255,179,71,0.1) 0%, rgba(255,107,43,0.05) 100%);
+    border-color: rgba(255,179,71,0.22);
+  }
+  .offer-small.kiff:hover { border-color: rgba(255,179,71,0.45); box-shadow: 0 16px 40px -10px rgba(255,179,71,0.2); }
+  .offer-small.kiff .offer-small-badge {
+    background: rgba(255,179,71,0.15); border: 1px solid rgba(255,179,71,0.35);
+    color: var(--accent-2);
+  }
+  .offer-small.kiff .offer-arrow { color: var(--accent-2); }
+
+  /* Tex Mex — warm red tint */
+  .offer-small.texmex {
+    background: linear-gradient(135deg, rgba(220,60,40,0.1) 0%, rgba(255,107,43,0.05) 100%);
+    border-color: rgba(220,80,50,0.22);
+  }
+  .offer-small.texmex:hover { border-color: rgba(220,80,50,0.45); box-shadow: 0 16px 40px -10px rgba(220,60,40,0.2); }
+  .offer-small.texmex .offer-small-badge {
+    background: rgba(220,80,50,0.15); border: 1px solid rgba(220,80,50,0.35);
+    color: #ff9076;
+  }
+  .offer-small.texmex .offer-arrow { color: #ff9076; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .offers-grid { grid-template-columns: 1fr 1fr; }
+    .offer-hero { grid-column: 1 / span 2; grid-row: 1; min-height: 280px; }
+    .offer-small { grid-column: span 1; grid-row: auto; }
+    .offer-hero-emoji { font-size: 110px; }
+  }
+  @media (max-width: 540px) {
+    .offers-grid { grid-template-columns: 1fr; }
+    .offer-hero { grid-column: 1; min-height: 260px; }
+    .offer-small { grid-column: 1; }
+    .offer-hero-emoji { font-size: 90px; opacity: 0.5; top: 16px; transform: none; }
+  }
+
+  /* ── DIVIDER ROW ── */
+  .divider { grid-column: span 12; height: 1px; background: var(--border); margin: 8px 0; border-radius: 1px; }
+
+  /* ── FOOTER ── */
+  .footer-wrap {
+    position: relative; z-index: 1;
+    margin-top: 24px;
+  }
+
+  /* Newsletter banner */
+  .footer-newsletter {
+    max-width: 1200px; margin: 0 auto 0;
+    padding: 0 24px;
+  }
+
+  .newsletter-inner {
+    border-radius: var(--radius);
+    background: linear-gradient(130deg, rgba(255,107,43,0.22) 0%, rgba(255,140,50,0.10) 40%, rgba(20,14,10,0.6) 100%);
+    border: 1px solid rgba(255,107,43,0.30);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    padding: 48px 56px;
+    display: flex; align-items: center; justify-content: space-between; gap: 48px;
+    position: relative; overflow: hidden;
+  }
+
+  .newsletter-inner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 10% 50%, rgba(255,107,43,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .newsletter-left { flex: 1; position: relative; z-index: 1; }
+
+  .newsletter-eyebrow {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-2);
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .newsletter-eyebrow::before {
+    content: '';
+    width: 18px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    display: inline-block;
+  }
+
+  .newsletter-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 400; line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .newsletter-sub {
+    color: var(--text-muted); font-size: 0.84rem; line-height: 1.6;
+    max-width: 340px;
+  }
+
+  .newsletter-right { flex-shrink: 0; width: 340px; position: relative; z-index: 1; }
+
+  .newsletter-label {
+    font-size: 0.76rem; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.02em;
+  }
+
+  .newsletter-form {
+    display: flex; gap: 0;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 100px;
+    padding: 4px 4px 4px 18px;
+    align-items: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .newsletter-form:focus-within {
+    border-color: rgba(255,107,43,0.5);
+    box-shadow: 0 0 0 3px rgba(255,107,43,0.12);
+  }
+
+  .newsletter-input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.84rem; padding: 8px 0;
+    min-width: 0;
+  }
+  .newsletter-input::placeholder { color: var(--text-dim); }
+
+  .newsletter-btn {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    border: none; color: #fff;
+    padding: 10px 20px; border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.03em;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(255,107,43,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .newsletter-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,107,43,0.5); }
+
+  .newsletter-legal {
+    font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;
+  }
+  .newsletter-legal a { color: var(--accent-2); text-decoration: none; }
+  .newsletter-legal a:hover { text-decoration: underline; }
+
+  /* Main footer */
+  footer {
+    max-width: 1200px; margin: 0 auto;
+    padding: 52px 24px 32px;
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+
+  .footer-brand {}
+
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; font-weight: 400;
+    background: linear-gradient(135deg, #fff 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px; display: block;
+  }
+  .footer-logo span { -webkit-text-fill-color: var(--accent); }
+
+  .footer-tagline {
+    color: var(--text-muted); font-size: 0.82rem; line-height: 1.6;
+    max-width: 220px; margin-bottom: 24px;
+  }
+
+  .footer-socials { display: flex; gap: 10px; }
+  .footer-social-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 0.85rem; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .footer-social-btn:hover {
+    background: rgba(255,107,43,0.15); border-color: rgba(255,107,43,0.4);
+    color: var(--accent-2); transform: translateY(-2px);
+  }
+
+  .footer-col-title {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text);
+    margin-bottom: 18px;
+  }
+
+  .footer-col-links { display: flex; flex-direction: column; gap: 12px; }
+  .footer-col-links a {
+    color: var(--text-muted); font-size: 0.84rem; text-decoration: none;
+    transition: color 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .footer-col-links a:hover { color: var(--text); }
+
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    padding: 20px 24px 32px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+
+  .footer-copy { color: var(--text-dim); font-size: 0.76rem; }
+
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a {
+    color: var(--text-dim); font-size: 0.76rem; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-bottom-links a:hover { color: var(--text-muted); }
+
+  @media (max-width: 900px) {
+    .newsletter-inner { flex-direction: column; gap: 32px; padding: 36px; }
+    .newsletter-right { width: 100%; }
+    footer { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  @media (max-width: 540px) {
+    .newsletter-inner { padding: 28px 24px; }
+    footer { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .footer-bottom-links { flex-wrap: wrap; justify-content: center; }
+  }
+
+  /* ── FADE IN ANIMATION ── */
+  .glass, .card-hero, .card-product {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* stagger delays */
+  .bento > *:nth-child(1)  { animation-delay: 0.05s; }
+  .bento > *:nth-child(2)  { animation-delay: 0.10s; }
+  .bento > *:nth-child(3)  { animation-delay: 0.15s; }
+  .bento > *:nth-child(4)  { animation-delay: 0.20s; }
+  .bento > *:nth-child(5)  { animation-delay: 0.25s; }
+  .bento > *:nth-child(6)  { animation-delay: 0.30s; }
+  .bento > *:nth-child(7)  { animation-delay: 0.35s; }
+  .bento > *:nth-child(8)  { animation-delay: 0.40s; }
+  .bento > *:nth-child(9)  { animation-delay: 0.45s; }
+  .bento > *:nth-child(10) { animation-delay: 0.50s; }
+  .bento > *:nth-child(11) { animation-delay: 0.55s; }
+  .bento > *:nth-child(12) { animation-delay: 0.60s; }
+  .bento > *:nth-child(n+13) { animation-delay: 0.65s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .bento { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 70px; gap: 10px; }
+    .card-hero { grid-column: span 6; grid-row: span 7; padding: 36px; }
+    .card-status { grid-column: span 6; grid-row: span 2; }
+    .cat-item { min-width: 100px; }
+    .card-promo { grid-column: span 6 !important; grid-row: span 3 !important; }
+    .card-product { grid-column: span 3; }
+    .card-delivery { grid-column: span 6; }
+    .card-feat { grid-column: span 3; }
+    .card-contact { grid-column: span 6; }
+    .section-header { grid-column: span 6; }
+    .divider { grid-column: span 6; }
+    .nav-links { display: none; }
+    .hero-emoji { font-size: 160px; right: 2%; }
+  }
+
+  @media (max-width: 540px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .card-hero { grid-column: span 2; grid-row: span 8; padding: 28px 24px; }
+    .hero-emoji { font-size: 100px; top: 20px; right: 0; transform: none; opacity: 0.6; }
+    .card-status { grid-column: span 2; }
+    .cat-item { min-width: 80px; }
+    .card-promo { grid-column: span 2 !important; }
+    .card-product { grid-column: span 1; }
+    .card-delivery { grid-column: span 2; }
+    .card-feat { grid-column: span 1; }
+    .card-contact { grid-column: span 2; }
+    .section-header { grid-column: span 2; }
+    .divider { grid-column: span 2; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<div style="padding: 16px 24px 0; position: sticky; top: 12px; z-index: 100;">
+<nav>
+  <div class="nav-logo">Hiba<span>Food</span></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Accueil</a></li>
+    <li><a href="#">Menu</a></li>
+    <li><a href="#">Nos Offres</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="nav-icons">
+    <button class="nav-icon-btn" title="Mon Compte">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </button>
+    <button class="nav-icon-btn" title="Favoris">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span class="badge">0</span>
+    </button>
+    <button class="nav-icon-btn" title="Panier">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="badge">0</span>
+    </button>
+    <button class="nav-icon-btn" title="Rechercher">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+</nav>
+</div>
+
+<main>
+<div class="bento">
+
+  <div class="card-hero glass">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Livraison Express · Ferrières-en-Gâtinais</div>
+      <h1 class="hero-title">
+        Une Faim<br>
+        <span class="highlight">Irrésistible</span><br>
+        Livrée Chez&nbsp;Vous
+      </h1>
+      <p class="hero-sub">Pizzas, Burgers, Tacos & Sandwiches préparés avec des ingrédients frais. Un clic suffit.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">Commander maintenant</a>
+        <a href="#" class="btn-ghost">Voir le menu</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="categories-section">
+  <div class="section-header-left">
+    <div class="card-label">Parcourir</div>
+    <h2 class="section-title">Nos <span class="title-highlight">Catégories</span></h2>
+  </div>
+  <div class="cat-grid">
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🍕</span>
+      <div class="cat-info">
+        <div class="cat-name">Pizza</div>
+        <div class="cat-count">33 références</div>
+      </div>
+    </a>
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🍔</span>
+      <div class="cat-info">
+        <div class="cat-name">Burgers</div>
+        <div class="cat-count">7 références</div>
+      </div>
+    </a>
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🌯</span>
+      <div class="cat-info">
+        <div class="cat-name">Sandwiches</div>
+        <div class="cat-count">6 références</div>
+      </div>
+    </a>
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🌮</span>
+      <div class="cat-info">
+        <div class="cat-name">Tacos</div>
+        <div class="cat-count">3 références</div>
+      </div>
+    </a>
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🍟</span>
+      <div class="cat-info">
+        <div class="cat-name">Croustillants</div>
+        <div class="cat-count">5 références</div>
+      </div>
+    </a>
+    <a href="#" class="cat-item">
+      <span class="cat-emoji">🥤</span>
+      <div class="cat-info">
+        <div class="cat-name">Boissons</div>
+        <div class="cat-count">17 références</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ── SPECIAL OFFERS SECTION ── -->
+<div class="offers-section">
+  <div class="offers-header">
+    <div>
+      <div class="card-label">Promotions du Moment</div>
+      <h2 class="section-title">Offres <span class="title-highlight">Spéciales</span> <span class="title-emoji">🎉</span></h2>
+    </div>
+    <a href="#" class="section-link">Tout voir →</a>
+  </div>
+
+  <div class="offers-grid">
+
+    <!-- Hero Offer: Offre Spéciale -->
+    <div class="offer-hero">
+      <div class="offer-hero-bg"></div>
+      <div class="offer-hero-emoji">🍟</div>
+      <div class="offer-hero-content">
+        <div class="offer-badge">⭐ Offre Spéciale</div>
+        <div class="offer-hero-title">Duo Meals —<br>Le Partage en Grand</div>
+        <div class="offer-hero-desc">2 burgers + 1 parquet de frites + 1 boisson. La formule gourmande pour deux, livrée en 30 min.</div>
+        <div class="offer-price-row">
+          <div class="offer-price">19,90 €</div>
+          <div class="offer-price-old">24,80 €</div>
+          <div class="offer-saving">−20%</div>
+        </div>
+        <a href="#" class="offer-cta">Commander le Duo →</a>
+      </div>
+    </div>
+
+    <!-- Small Card: Double Kiff -->
+    <div class="offer-small kiff">
+      <div>
+        <div class="offer-small-badge">🍕 Double Kiff</div>
+        <div class="offer-small-top">
+          <div>
+            <div class="offer-small-title">Doublez<br>le Plaisir</div>
+            <div class="offer-small-desc">1 pizza, 2 fois plus gourmande. Idéale pour les grands appétits qui ne font pas de compromis.</div>
+          </div>
+          <div class="offer-small-emoji">🍕</div>
+        </div>
+      </div>
+      <div class="offer-small-footer">
+        <div class="offer-small-price">14,90 €</div>
+        <a href="#" class="offer-arrow">Découvrir →</a>
+      </div>
+    </div>
+
+    <!-- Small Card: Tex Mex -->
+    <div class="offer-small texmex">
+      <div>
+        <div class="offer-small-badge">🌮 Tex Mex</div>
+        <div class="offer-small-top">
+          <div>
+            <div class="offer-small-title">Saveurs<br>du Sud-Ouest</div>
+            <div class="offer-small-desc">Tacos croustillants, épices tex-mex, sauce pimentée. Un voyage gustatif en quelques bouchées.</div>
+          </div>
+          <div class="offer-small-emoji">🌮</div>
+        </div>
+      </div>
+      <div class="offer-small-footer">
+        <div class="offer-small-price">11,90 €</div>
+        <a href="#" class="offer-arrow">Découvrir →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="bento">
+
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="card-label">Les Incontournables</div>
+      <h2 class="section-title">Nos <span class="title-highlight">Best-Sellers</span> <span class="title-emoji">🔥</span></h2>
+    </div>
+    <a href="#" class="section-link">Tout voir →</a>
+  </div>
+
+  <div class="card-product glass">
+    <div class="product-img">
+      <span class="img-emoji">🍔</span>
+    </div>
+    <div class="product-body">
+      <div class="product-name">Cheese Burger</div>
+      <div class="product-desc">Buns briochés, steak bœuf, cheddar, sauce burger, salade, tomate, oignon rouge</div>
+      <div class="product-footer">
+        <div class="product-price">7,90 €</div>
+        <button class="btn-add">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-product glass">
+    <div class="product-img">
+      <span class="img-emoji">🍗</span>
+    </div>
+    <div class="product-body">
+      <div class="product-name">Chicken Burger</div>
+      <div class="product-desc">Buns briochés, filet de poulet, cheddar, sauce chicken, salade, tomate, oignon rouge</div>
+      <div class="product-footer">
+        <div class="product-price">9,90 €</div>
+        <button class="btn-add">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-product glass">
+    <div class="product-img">
+      <span class="img-emoji" style="font-size:60px">🍔🍔</span>
+    </div>
+    <div class="product-body">
+      <div class="product-name">Duo Cheese Royale</div>
+      <div class="product-desc">2 Burger Cheese Royale · 1 parquet de frites · 1 boisson</div>
+      <div class="product-footer">
+        <div class="product-price">13,90 €</div>
+        <button class="btn-add">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-product glass">
+    <div class="product-img">
+      <span class="img-emoji" style="font-size:58px">🍗🍔</span>
+    </div>
+    <div class="product-body">
+      <div class="product-name">Duo Chicken Royale</div>
+      <div class="product-desc">2 Burger Chicken Royale · 1 parquet de frites · 1 boisson</div>
+      <div class="product-footer">
+        <div class="product-price">15,90 €</div>
+        <button class="btn-add">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="card-label">Pourquoi Nous Choisir</div>
+      <h2 class="section-title">Notre <span class="title-highlight">Engagement</span> <span class="title-emoji">🛵</span></h2>
+    </div>
+  </div>
+
+  <div class="card-delivery glass" style="border-radius: var(--radius);">
+    <div class="delivery-emoji">🛵</div>
+    <div class="delivery-title">Livraison Express<br>& Fiable 🚀</div>
+    <p class="delivery-sub">Passez votre commande en quelques instants, détendez-vous et laissez-nous livrer des saveurs irrésistibles directement chez vous.</p>
+    <div class="delivery-stats">
+      <div class="stat">
+        <div class="stat-val">~30'</div>
+        <div class="stat-label">Délai moyen</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">7j/7</div>
+        <div class="stat-label">Ouvert</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">100%</div>
+        <div class="stat-label">Frais garantis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-feat glass">
+    <div class="feat-icon">😊</div>
+    <div>
+      <div class="feat-title">Équipe Passionnée</div>
+      <div class="feat-desc">Un accueil chaleureux pour une expérience inoubliable à chaque commande.</div>
+    </div>
+  </div>
+
+  <div class="card-feat glass">
+    <div class="feat-icon">🍴</div>
+    <div>
+      <div class="feat-title">Recettes Authentiques</div>
+      <div class="feat-desc">Des saveurs uniques concoctées avec des ingrédients frais et locaux.</div>
+    </div>
+  </div>
+
+  <div class="card-feat glass">
+    <div class="feat-icon">🛍</div>
+    <div>
+      <div class="feat-title">Retrait Rapide</div>
+      <div class="feat-desc">Commandez en ligne, retirez sur place en toute simplicité.</div>
+    </div>
+  </div>
+
+  <div class="card-feat glass">
+    <div class="feat-icon">💨</div>
+    <div>
+      <div class="feat-title">Livraison Express</div>
+      <div class="feat-desc">Vos repas favoris livrés en un éclair, chauds et savoureux.</div>
+    </div>
+  </div>
+
+
+
+</div>
+</main>
+
+<div class="footer-wrap">
+
+  <!-- Newsletter -->
+  <div class="footer-newsletter">
+    <div class="newsletter-inner">
+      <div class="newsletter-left">
+        <div class="newsletter-eyebrow">Restez Informé</div>
+        <div class="newsletter-title">Nos offres,<br>directement chez vous</div>
+        <p class="newsletter-sub">Recevez nos promotions exclusives, nouveautés et menus du moment avant tout le monde.</p>
+      </div>
+      <div class="newsletter-right">
+        <div class="newsletter-label">Votre adresse e-mail</div>
+        <div class="newsletter-form">
+          <input class="newsletter-input" type="email" placeholder="exemple@email.com" />
+          <button class="newsletter-btn">S'abonner</button>
+        </div>
+        <div class="newsletter-legal">En vous inscrivant, vous acceptez notre <a href="#">Politique de confidentialité</a>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer grid -->
+  <footer>
+    <div class="footer-brand">
+      <span class="footer-logo">Hiba<span>Food</span></span>
+      <p class="footer-tagline">Pizzas, Burgers, Tacos & Sandwiches livrés chez vous en 30 min. Frais, chauds, irrésistibles.</p>
+      <div class="footer-socials">
+        <a href="#" class="footer-social-btn" title="Instagram">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        </a>
+        <a href="#" class="footer-social-btn" title="Facebook">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" class="footer-social-btn" title="TikTok">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">Menu</div>
+      <div class="footer-col-links">
+        <a href="#">🍕 Pizzas</a>
+        <a href="#">🍔 Burgers</a>
+        <a href="#">🌯 Sandwiches</a>
+        <a href="#">🌮 Tacos</a>
+        <a href="#">🍟 Croustillants</a>
+        <a href="#">🥤 Boissons</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">Commande</div>
+      <div class="footer-col-links">
+        <a href="#">Commander en ligne</a>
+        <a href="#">Nos Offres Spéciales</a>
+        <a href="#">Suivre ma commande</a>
+        <a href="#">Livraison Express</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">Infos</div>
+      <div class="footer-col-links">
+        <a href="#">À propos</a>
+        <a href="#">Contact</a>
+        <a href="#">Horaires</a>
+        <a href="#">Mentions légales</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 HibaFood · Ferrières-en-Gâtinais · Tous droits réservés</div>
+    <div class="footer-bottom-links">
+      <a href="#">Confidentialité</a>
+      <a href="#">CGU</a>
+      <a href="#">Cookies</a>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+  // Add to cart micro-interaction
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      btn.textContent = '✓';
+      btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+      setTimeout(() => {
+        btn.textContent = '+';
+        btn.style.background = '';
+      }, 1400);
+    });
+  });
+
+  // Scroll-triggered fade-in for cards below the fold
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        observer.unobserve(e.target);
+      }
+    });
+  });
+  
+  // document.querySelectorAll('.card-product, .card-feat').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

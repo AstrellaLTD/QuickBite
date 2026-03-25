@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User & Auth ─────────────────────────────────────────────
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         String   @default("CUSTOMER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  addresses      Address[]
+  orders         Order[]        @relation("CustomerOrders")
+  deliveries     Order[]        @relation("DriverOrders")
+  favorites      Favorite[]
+  driverLocation DriverLocation?
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  label     String  @default("Home")
+  street    String
+  city      String
+  postalCode String
+  lat       Float?
+  lng       Float?
+  isDefault Boolean @default(false)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId])
+}
+
+// ─── Menu ────────────────────────────────────────────────────
+model Category {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  items MenuItem[]
+}
+
+model MenuItem {
+  id          String  @id @default(cuid())
+  categoryId  String
+  name        String
+  description String?
+  price       Float
+  isAvailable Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  category       Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  customizations ItemCustomization[]
+  dealItems      DealItem[]
+  favorites      Favorite[]
+  orderItems     OrderItem[]
+
+  @@index([categoryId])
+}
+
+model ItemCustomization {
+  id         String  @id @default(cuid())
+  menuItemId String
+  name       String  // e.g. "Size", "Extras", "Remove"
+  type       String  @default("RADIO") // RADIO or CHECKBOX
+  isRequired Boolean @default(false)
+  sortOrder  Int     @default(0)
+
+  menuItem MenuItem              @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  options  CustomizationOption[]
+
+  @@index([menuItemId])
+}
+
+model CustomizationOption {
+  id              String @id @default(cuid())
+  customizationId String
+  label           String  // e.g. "Large", "Extra Cheese"
+  priceModifier   Float   @default(0)
+  sortOrder       Int     @default(0)
+
+  customization ItemCustomization @relation(fields: [customizationId], references: [id], onDelete: Cascade)
+
+  @@index([customizationId])
+}
+
+// ─── Deals ───────────────────────────────────────────────────
+model Deal {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  dealPrice   Float
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  items DealItem[]
+}
+
+model DealItem {
+  id         String @id @default(cuid())
+  dealId     String
+  menuItemId String
+
+  deal     Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@index([dealId])
+  @@index([menuItemId])
+}
+
+// ─── Orders ──────────────────────────────────────────────────
+model Order {
+  id           String   @id @default(cuid())
+  userId       String?
+  driverId     String?
+  addressId    String?
+  status       String   @default("PENDING") // PENDING, CONFIRMED, PREPARING, READY, PICKED_UP, DELIVERING, DELIVERED, CANCELLED
+  subtotal     Float
+  deliveryFee  Float    @default(0)
+  total        Float
+  guestName    String?
+  guestPhone   String?
+  guestAddress String?
+  scheduledFor DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customer User?       @relation("CustomerOrders", fields: [userId], references: [id])
+  driver   User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  address  Address?    @relation(fields: [addressId], references: [id])
+  items    OrderItem[]
+
+  @@index([userId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model OrderItem {
+  id                     String  @id @default(cuid())
+  orderId                String
+  menuItemId             String
+  quantity               Int     @default(1)
+  specialInstructions    String?
+  selectedCustomizations String? // JSON string of selected options
+  itemTotal              Float
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([orderId])
+}
+
+// ─── Delivery ────────────────────────────────────────────────
+model DeliveryZone {
+  id       String  @id @default(cuid())
+  name     String
+  radiusKm Float
+  baseFee  Float   @default(2.0)
+  perKmFee Float   @default(0.5)
+  isActive Boolean @default(true)
+}
+
+model DriverLocation {
+  id        String   @id @default(cuid())
+  driverId  String   @unique
+  lat       Float
+  lng       Float
+  updatedAt DateTime @updatedAt
+
+  driver User @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+// ─── Favorites ───────────────────────────────────────────────
+model Favorite {
+  id         String @id @default(cuid())
+  userId     String
+  menuItemId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, menuItemId])
+  @@index([userId])
+}
