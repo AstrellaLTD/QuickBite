@@ -55,22 +55,26 @@ export default function CartPage() {
                     {/* Item Info */}
                     <div style={{ flex: 1 }}>
                       <div className="flex-between" style={{ alignItems: 'flex-start' }}>
-                        <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>{item.menuItem.name}</h3>
+                        <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 600 }}>{item.product.name}</h3>
                         <span style={{ fontWeight: 600 }}>{formatPrice(item.itemTotal)}</span>
                       </div>
-                      
-                      {/* Customizations */}
-                      {item.selectedCustomizations.length > 0 && (
-                        <ul style={{ 
-                          fontSize: 'var(--text-sm)', 
-                          color: 'var(--color-text-secondary)', 
+
+                      {/* Selections */}
+                      {(item.selectedVariation || item.selectedOptions.length > 0 || item.selectedExtras.length > 0) && (
+                        <ul style={{
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--color-text-secondary)',
                           marginTop: 'var(--space-xs)',
                           listStyle: 'none'
                         }}>
-                          {item.selectedCustomizations.map((c, i) => (
-                            <li key={i}>
-                              • {c.optionLabel} {c.priceModifier > 0 ? `(+${formatPrice(c.priceModifier)})` : ''}
-                            </li>
+                          {item.selectedVariation && (
+                            <li>• {item.selectedVariation.name} ({formatPrice(item.selectedVariation.price)})</li>
+                          )}
+                          {item.selectedOptions.map((o, i) => (
+                            <li key={i}>• {o.choiceName} {o.priceAdd > 0 ? `(+${formatPrice(o.priceAdd)})` : ''}</li>
+                          ))}
+                          {item.selectedExtras.map((e, i) => (
+                            <li key={i}>• {e.name} (+{formatPrice(e.priceAdd)})</li>
                           ))}
                         </ul>
                       )}

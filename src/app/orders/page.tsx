@@ -30,7 +30,7 @@ export default async function OrdersListPage() {
     include: {
       items: {
         include: {
-          menuItem: true
+          product: true
         }
       }
     }
@@ -91,7 +91,7 @@ export default async function OrdersListPage() {
 
               <div>
                 <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {order.items.map(item => `${item.quantity}x ${item.menuItem?.name || 'Item'}`).join(', ')}
+                  {(order as any).items.map((item: any) => `${item.quantity}x ${item.product?.name || 'Article'}`).join(', ')}
                 </p>
               </div>
             </Link>

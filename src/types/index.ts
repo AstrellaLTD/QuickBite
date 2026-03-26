@@ -9,61 +9,104 @@ export interface SessionUser {
 }
 
 // ─── Menu Types ────────────────────────────────────────────
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  sortOrder: number;
-  isActive: boolean;
-  items?: MenuItem[];
-}
-
-export interface MenuItem {
+export interface Subcategory {
   id: string;
   categoryId: string;
+  slug: string;
+  name: string;
+  imageUrl: string | null;
+  sortOrder: number;
+}
+
+export interface Category {
+  id: string;
+  slug: string;
+  name: string;
+  emoji: string;
+  description: string | null;
+  imageUrl: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  subcategories: Subcategory[];
+}
+
+export interface ProductVariation {
+  id: string;
+  name: string;   // "Junior", "Senior", "Mega"
+  price: number;
+  sortOrder: number;
+}
+
+export interface OptionChoice {
+  id: string;
+  name: string;
+  priceAdd: number;
+  sortOrder: number;
+}
+
+export interface RequiredOptionGroup {
+  id: string;
+  name: string;       // "Viande", "Sauces"
+  maxSelect: number;
+  sortOrder: number;
+  choices: OptionChoice[];
+}
+
+export interface ProductExtra {
+  id: string;
+  name: string;
+  priceAdd: number;
+  sortOrder: number;
+}
+
+export interface Product {
+  id: string;
+  slug: string;
+  categoryId: string;
+  subcategoryId: string | null;
   name: string;
   description: string | null;
-  price: number;
-  image: string | null;
+  basePrice: number;
+  maxPrice: number | null;
+  imageUrl: string | null;
   isAvailable: boolean;
-  category?: Category;
-  customizations?: ItemCustomization[];
-}
-
-export interface ItemCustomization {
-  id: string;
-  menuItemId: string;
-  name: string;
-  type: 'RADIO' | 'CHECKBOX';
-  isRequired: boolean;
-  sortOrder: number;
-  options: CustomizationOption[];
-}
-
-export interface CustomizationOption {
-  id: string;
-  customizationId: string;
-  label: string;
-  priceModifier: number;
-  sortOrder: number;
+  isBestSeller: boolean;
+  note: string | null;
+  variations: ProductVariation[];
+  optionGroups: RequiredOptionGroup[];
+  extras: ProductExtra[];
 }
 
 // ─── Cart Types ────────────────────────────────────────────
-export interface CartItem {
-  id: string; // Unique cart line ID
-  menuItem: MenuItem;
-  quantity: number;
-  selectedCustomizations: SelectedCustomization[];
-  specialInstructions: string;
-  itemTotal: number;
+export interface SelectedVariation {
+  variationId: string;
+  name: string;
+  price: number;
 }
 
-export interface SelectedCustomization {
-  customizationId: string;
-  customizationName: string;
-  optionId: string;
-  optionLabel: string;
-  priceModifier: number;
+export interface SelectedOption {
+  groupId: string;
+  groupName: string;
+  choiceId: string;
+  choiceName: string;
+  priceAdd: number;
+}
+
+export interface SelectedExtra {
+  extraId: string;
+  name: string;
+  priceAdd: number;
+}
+
+export interface CartItem {
+  id: string;
+  product: Product;
+  quantity: number;
+  selectedVariation: SelectedVariation | null;
+  selectedOptions: SelectedOption[];
+  selectedExtras: SelectedExtra[];
+  specialInstructions: string;
+  itemTotal: number;
 }
 
 // ─── Order Types ───────────────────────────────────────────
@@ -88,8 +131,7 @@ export interface Order {
   total: number;
   guestName: string | null;
   guestPhone: string | null;
-  guestAddress: string | null;
-  scheduledFor: string | null;
+  guestEmail: string | null;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
@@ -100,42 +142,27 @@ export interface Order {
 
 export interface OrderItem {
   id: string;
-  menuItemId: string;
+  productId: string;
   quantity: number;
   specialInstructions: string | null;
-  selectedCustomizations: string | null;
+  selectedVariation: string | null;
+  selectedOptions: string | null;
+  selectedExtras: string | null;
+  unitPrice: number;
   itemTotal: number;
-  menuItem?: MenuItem;
+  product?: Product;
 }
 
 // ─── Address Types ─────────────────────────────────────────
 export interface Address {
   id: string;
-  userId: string;
+  userId: string | null;
   label: string;
   street: string;
   city: string;
   postalCode: string;
   lat: number | null;
   lng: number | null;
-  isDefault: boolean;
-}
-
-// ─── Deal Types ────────────────────────────────────────────
-export interface Deal {
-  id: string;
-  name: string;
-  description: string | null;
-  dealPrice: number;
-  isActive: boolean;
-  items: DealItem[];
-}
-
-export interface DealItem {
-  id: string;
-  dealId: string;
-  menuItemId: string;
-  menuItem?: MenuItem;
 }
 
 // ─── API Response Types ────────────────────────────────────

@@ -20,13 +20,7 @@ export default async function OrderPage(props: any) {
       address: true,
       items: {
         include: {
-          menuItem: true
-        }
-      },
-      driver: {
-        select: {
-          name: true,
-          phone: true,
+          product: true
         }
       }
     }
@@ -132,12 +126,11 @@ export default async function OrderPage(props: any) {
             })}
           </div>
           
-          {order.driver && order.status === 'ON_THE_WAY' && (
+          {order.driverId && order.status === 'ON_THE_WAY' && (
             <div style={{ marginTop: 'var(--space-lg)', padding: 'var(--space-md)', background: 'rgba(255, 107, 53, 0.05)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-              <div style={{ fontSize: '2rem' }}>👨‍🚀</div>
+              <div style={{ fontSize: '2rem' }}>🛵</div>
               <div>
-                <p style={{ fontWeight: 600 }}>Your driver, {order.driver.name}</p>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>Contact: {order.driver.phone || 'N/A'}</p>
+                <p style={{ fontWeight: 600 }}>Votre commande est en route !</p>
               </div>
             </div>
           )}
@@ -150,28 +143,24 @@ export default async function OrderPage(props: any) {
           <h3 style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-md)' }}>Order Summary</h3>
           <div className="card">
             <div className="flex-col" style={{ gap: 'var(--space-md)' }}>
-              {order.items.map((item) => {
-                const parsedCustomizations = item.selectedCustomizations ? JSON.parse(item.selectedCustomizations) : [];
-                return (
+              {(order as any).items.map((item: any) => (
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 'var(--space-sm)', borderBottom: '1px solid var(--color-border)' }}>
                   <div>
-                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.menuItem.name}</span>
-                    {parsedCustomizations.length > 0 && (
-                      <ul style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginTop: '4px', listStyle: 'none' }}>
-                        {parsedCustomizations.map((c: any, idx: number) => (
-                          <li key={idx}>• {c.name}: {c.optionLabel}</li>
-                        ))}
-                      </ul>
+                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.product?.name ?? 'Article'}</span>
+                    {item.selectedVariation && (
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                        • {item.selectedVariation}
+                      </p>
                     )}
                     {item.specialInstructions && (
                       <p style={{ fontSize: 'var(--text-xs)', fontStyle: 'italic', marginTop: '4px', color: 'var(--color-text-secondary)' }}>
-                        "{item.specialInstructions}"
+                        &ldquo;{item.specialInstructions}&rdquo;
                       </p>
                     )}
                   </div>
                   <span style={{ fontWeight: 600 }}>{formatPrice(item.itemTotal)}</span>
                 </div>
-              )})}
+              ))}
             </div>
 
             <div className="flex-col gap-xs" style={{ marginTop: 'var(--space-md)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--color-border)' }}>
@@ -196,13 +185,13 @@ export default async function OrderPage(props: any) {
           <h3 style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-md)' }}>Delivery Details</h3>
           <div className="card flex-col gap-lg">
             
-            {order.address && (
+            {(order as any).address && (
               <div>
                 <h4 style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-xs)' }}>
-                  Delivery Address
+                  Adresse de livraison
                 </h4>
-                <p style={{ fontWeight: 500 }}>{order.address.street}</p>
-                <p style={{ color: 'var(--color-text-secondary)' }}>{order.address.city}, {order.address.postalCode}</p>
+                <p style={{ fontWeight: 500 }}>{(order as any).address.street}</p>
+                <p style={{ color: 'var(--color-text-secondary)' }}>{(order as any).address.city}, {(order as any).address.postalCode}</p>
               </div>
             )}
 

@@ -19,11 +19,12 @@ export default function Header() {
   const isAdmin = pathname.startsWith('/admin');
   const isDriver = pathname.startsWith('/driver');
   const isLanding = pathname === '/';
-  if (isAdmin || isDriver || isLanding) return null;
+  const isStore = pathname.startsWith('/store');
+  if (isAdmin || isDriver || isLanding || isStore) return null;
 
   const navItems = [
     { href: '/', label: 'Home' },
-    { href: '/menu', label: 'Menu' },
+    { href: '/store', label: 'Menu' },
     { href: '/orders', label: 'Orders' },
   ];
 

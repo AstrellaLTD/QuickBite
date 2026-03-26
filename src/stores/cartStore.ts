@@ -1,34 +1,42 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { CartItem, MenuItem, SelectedCustomization } from '@/types';
+import { CartItem, Product, SelectedVariation, SelectedOption, SelectedExtra } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface CartState {
   items: CartItem[];
   subtotal: number;
-  
-  // Actions
+
   addItem: (
-    menuItem: MenuItem,
+    product: Product,
     quantity: number,
-    customizations: SelectedCustomization[],
+    selectedVariation: SelectedVariation | null,
+    selectedOptions: SelectedOption[],
+    selectedExtras: SelectedExtra[],
     specialInstructions: string
   ) => void;
   removeItem: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
-  
   getCartCount: () => number;
 }
 
-const calculateItemTotal = (basePrice: number, customizations: SelectedCustomization[], quantity: number) => {
-  const modsTotal = customizations.reduce((acc, current) => acc + current.priceModifier, 0);
-  return (basePrice + modsTotal) * quantity;
-};
+function calcItemTotal(
+  product: Product,
+  variation: SelectedVariation | null,
+  options: SelectedOption[],
+  extras: SelectedExtra[],
+  qty: number
+): number {
+  const base = variation ? variation.price : product.basePrice;
+  const optionsTotal = options.reduce((sum, o) => sum + o.priceAdd, 0);
+  const extrasTotal = extras.reduce((sum, e) => sum + e.priceAdd, 0);
+  return (base + optionsTotal + extrasTotal) * qty;
+}
 
-const calculateSubtotal = (items: CartItem[]) => {
-  return items.reduce((acc, item) => acc + item.itemTotal, 0);
-};
+function calcSubtotal(items: CartItem[]): number {
+  return items.reduce((sum, item) => sum + item.itemTotal, 0);
+}
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -36,53 +44,49 @@ export const useCartStore = create<CartState>()(
       items: [],
       subtotal: 0,
 
-      addItem: (menuItem, quantity, customizations, specialInstructions) => {
+      addItem: (product, quantity, selectedVariation, selectedOptions, selectedExtras, specialInstructions) => {
         set((state) => {
-          // Check if an identical item is already in the cart (same item + same customizations)
-          const existingItemIndex = state.items.findIndex(
+          // Check if identical item already in cart
+          const existingIndex = state.items.findIndex(
             (item) =>
-              item.menuItem.id === menuItem.id &&
-              JSON.stringify(item.selectedCustomizations) === JSON.stringify(customizations) &&
+              item.product.id === product.id &&
+              item.selectedVariation?.variationId === selectedVariation?.variationId &&
+              JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions) &&
+              JSON.stringify(item.selectedExtras) === JSON.stringify(selectedExtras) &&
               item.specialInstructions === specialInstructions
           );
 
-          let newItems = [...state.items];
+          const newItems = [...state.items];
 
-          if (existingItemIndex > -1) {
-            // Update quantity of existing item
-            const existing = newItems[existingItemIndex];
-            const newQuantity = existing.quantity + quantity;
-            newItems[existingItemIndex] = {
+          if (existingIndex > -1) {
+            const existing = newItems[existingIndex];
+            const newQty = existing.quantity + quantity;
+            newItems[existingIndex] = {
               ...existing,
-              quantity: newQuantity,
-              itemTotal: calculateItemTotal(menuItem.price, customizations, newQuantity),
+              quantity: newQty,
+              itemTotal: calcItemTotal(product, selectedVariation, selectedOptions, selectedExtras, newQty),
             };
           } else {
-            // Add new line item
             newItems.push({
               id: uuidv4(),
-              menuItem,
+              product,
               quantity,
-              selectedCustomizations: customizations,
+              selectedVariation,
+              selectedOptions,
+              selectedExtras,
               specialInstructions,
-              itemTotal: calculateItemTotal(menuItem.price, customizations, quantity),
+              itemTotal: calcItemTotal(product, selectedVariation, selectedOptions, selectedExtras, quantity),
             });
           }
 
-          return {
-            items: newItems,
-            subtotal: calculateSubtotal(newItems),
-          };
+          return { items: newItems, subtotal: calcSubtotal(newItems) };
         });
       },
 
       removeItem: (cartItemId) => {
         set((state) => {
           const newItems = state.items.filter((item) => item.id !== cartItemId);
-          return {
-            items: newItems,
-            subtotal: calculateSubtotal(newItems),
-          };
+          return { items: newItems, subtotal: calcSubtotal(newItems) };
         });
       },
 
@@ -91,40 +95,27 @@ export const useCartStore = create<CartState>()(
           get().removeItem(cartItemId);
           return;
         }
-
         set((state) => {
           const newItems = state.items.map((item) => {
             if (item.id === cartItemId) {
               return {
                 ...item,
                 quantity,
-                itemTotal: calculateItemTotal(
-                  item.menuItem.price,
-                  item.selectedCustomizations,
-                  quantity
-                ),
+                itemTotal: calcItemTotal(item.product, item.selectedVariation, item.selectedOptions, item.selectedExtras, quantity),
               };
             }
             return item;
           });
-
-          return {
-            items: newItems,
-            subtotal: calculateSubtotal(newItems),
-          };
+          return { items: newItems, subtotal: calcSubtotal(newItems) };
         });
       },
 
-      clearCart: () => {
-        set({ items: [], subtotal: 0 });
-      },
+      clearCart: () => set({ items: [], subtotal: 0 }),
 
-      getCartCount: () => {
-        return get().items.reduce((acc, item) => acc + item.quantity, 0);
-      },
+      getCartCount: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
     }),
     {
-      name: 'quickbite-cart',
+      name: 'hibafood-cart',
       storage: createJSONStorage(() => localStorage),
     }
   )

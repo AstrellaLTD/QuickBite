@@ -54,34 +54,29 @@ export async function POST(request: NextRequest) {
 
       // 2. Loop through items to calculate precise total
       const orderItemsData = [];
-      
+
       for (const cartItem of items) {
-        const dbItem = await tx.menuItem.findUnique({ where: { id: cartItem.menuItem.id } });
-        if (!dbItem) throw new Error(`Item ${cartItem.menuItem.name} not found`);
+        const dbProduct = await tx.product.findUnique({ where: { id: cartItem.product.id } });
+        if (!dbProduct) throw new Error(`Produit ${cartItem.product.name} introuvable`);
 
-        let itemModTotal = 0;
-        const customizationData = [];
+        const variationPrice = cartItem.selectedVariation?.price ?? null;
+        const basePrice = variationPrice ?? dbProduct.basePrice;
 
-        // Add customizations
-        for (const selected of cartItem.selectedCustomizations) {
-          // You should validate carefully in production
-          itemModTotal += selected.priceModifier;
-          customizationData.push({
-            name: selected.customizationName,
-            optionLabel: selected.optionLabel,
-            priceModifier: selected.priceModifier
-          });
-        }
-
-        const lineTotal = (dbItem.price + itemModTotal) * cartItem.quantity;
+        const optionsTotal = (cartItem.selectedOptions ?? []).reduce((s: number, o: any) => s + (o.priceAdd ?? 0), 0);
+        const extrasTotal = (cartItem.selectedExtras ?? []).reduce((s: number, e: any) => s + (e.priceAdd ?? 0), 0);
+        const unitPrice = basePrice + optionsTotal + extrasTotal;
+        const lineTotal = unitPrice * cartItem.quantity;
         subtotal += lineTotal;
 
         orderItemsData.push({
-          menuItemId: dbItem.id,
+          productId: dbProduct.id,
           quantity: cartItem.quantity,
-          specialInstructions: cartItem.specialInstructions || "",
-          selectedCustomizations: customizationData.length > 0 ? JSON.stringify(customizationData) : null,
-          itemTotal: lineTotal
+          selectedVariation: cartItem.selectedVariation ? JSON.stringify(cartItem.selectedVariation) : null,
+          selectedOptions: cartItem.selectedOptions?.length ? JSON.stringify(cartItem.selectedOptions) : null,
+          selectedExtras: cartItem.selectedExtras?.length ? JSON.stringify(cartItem.selectedExtras) : null,
+          specialInstructions: cartItem.specialInstructions || null,
+          unitPrice,
+          itemTotal: lineTotal,
         });
       }
 

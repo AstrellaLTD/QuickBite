@@ -9,7 +9,7 @@ export default function Footer() {
   // Custom landing page has its own footer
   if (pathname === '/') return null;
   // Admin/Driver also usually don't need this footer
-  if (pathname.startsWith('/admin') || pathname.startsWith('/driver')) return null;
+  if (pathname.startsWith('/admin') || pathname.startsWith('/driver') || pathname.startsWith('/store')) return null;
 
   return (
     <footer

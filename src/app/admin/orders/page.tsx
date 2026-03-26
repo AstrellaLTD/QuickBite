@@ -20,7 +20,7 @@ export default async function AdminOrdersPage() {
       },
       items: {
         include: {
-          menuItem: {
+          product: {
             select: { name: true }
           }
         }

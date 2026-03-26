@@ -28,24 +28,24 @@
   --color-info: #3B82F6;
   --color-info-bg: rgba(59, 130, 246, 0.1);
 
-  /* Background */
-  --bg-primary: #0F0F1A;
-  --bg-secondary: #1A1A2E;
-  --bg-tertiary: #25253D;
-  --bg-card: #1E1E35;
-  --bg-card-hover: #262645;
-  --bg-glass: rgba(30, 30, 53, 0.8);
-  --bg-overlay: rgba(15, 15, 26, 0.85);
+  /* Background — warm dark (matching landing/store) */
+  --bg-primary: #0e0d0b;
+  --bg-secondary: #161410;
+  --bg-tertiary: #1e1b16;
+  --bg-card: #1e1b16;
+  --bg-card-hover: #272319;
+  --bg-glass: rgba(22, 20, 16, 0.85);
+  --bg-overlay: rgba(14, 13, 11, 0.88);
 
-  /* Text */
-  --color-text: #F1F1F6;
-  --color-text-secondary: #A0A0BC;
-  --color-text-muted: #6B6B8A;
-  --color-text-inverse: #0F0F1A;
+  /* Text — cream tones */
+  --color-text: #f5ede0;
+  --color-text-secondary: #b8a990;
+  --color-text-muted: rgba(245, 237, 224, 0.4);
+  --color-text-inverse: #0e0d0b;
 
-  /* Borders */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.15);
+  /* Borders — warm amber tint */
+  --color-border: rgba(232, 168, 76, 0.12);
+  --color-border-hover: rgba(232, 168, 76, 0.22);
   --color-border-focus: var(--color-primary);
 
   /* Spacing */
@@ -131,7 +131,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle background pattern */
+/* Subtle warm background — amber glow + fine grid texture */
 body::before {
   content: '';
   position: fixed;
@@ -140,8 +140,11 @@ body::before {
   width: 100%;
   height: 100%;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 107, 53, 0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255, 184, 0, 0.05), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232, 168, 76, 0.10), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 80px 80px, 80px 80px;
+  background-attachment: fixed;
   pointer-events: none;
   z-index: -1;
 }
